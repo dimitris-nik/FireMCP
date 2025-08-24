@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "weather": {
+      "command": "npx",
+      "args": ["@h1deya/mcp-server-weather"],
+      "transportType": "stdio",
+      "enabled": true
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "transportType": "stdio",
+      "enabled": true
+    },
+    "local-time": {
+      "command": "uvx",
+      "args": ["mcp-server-time"],
+      "transportType": "stdio",
+      "enabled": true
+    }
+  }
+}
+
