@@ -35,6 +35,7 @@ sudo cp "$INIT_SCRIPT" "$MOUNT_DIR/root/"
 sudo chmod +x "$MOUNT_DIR/root/$INIT_SCRIPT"
 echo "[] Copying servers.json"
 sudo cp "$SERVER_CONFIG" "$MOUNT_DIR/root/"
+echo ". $HOME/.local/bin/env" | sudo tee -a $MOUNT_DIR/root/.bashrc
 echo "bash /root/initialize.sh" | sudo tee -a $MOUNT_DIR/root/.bashrc
 
 echo "[] Fetching kernel from aws CI"

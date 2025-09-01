@@ -6,6 +6,12 @@
       "transportType": "stdio",
       "enabled": true
     },
+    "fetch1": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "transportType": "stdio",
+      "enabled": true
+    },
     "fetch": {
       "command": "uvx",
       "args": ["mcp-server-fetch"],

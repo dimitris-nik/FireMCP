@@ -89,6 +89,9 @@ def run_vm():
     ]
     run(cmd)
 
+def update_server_list():
+    cmd = ["./update-server-list.sh"]
+    run(cmd)
 
 def main():
     device_name = detect_default_interface()
@@ -96,6 +99,7 @@ def main():
     ensure_tap()
     enable_ip_forward()
     ensure_iptables(device_name)
+    update_server_list()
     run_vm()
 
 
