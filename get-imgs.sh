@@ -48,4 +48,3 @@ rm -rf ubuntu*.squashfs
 
 echo "Done! Rootfs: $ROOTFS_IMG"
 echo "Kernel: $KERNEL_IMG"
-./start.sh
