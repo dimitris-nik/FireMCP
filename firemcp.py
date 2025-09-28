@@ -177,6 +177,7 @@ def cmd_auto():
         print("[+] VM appears to be running already (firectl/firecracker detected). Nothing to do.")
         return 0
     print("[+] Images present — starting VM...")
+    do_update_servers()
     do_start()
     return 0
 
@@ -184,7 +185,9 @@ def cmd_auto():
 def cmd_start():
     if vm_running():
         print("[!] VM appears to be running already. If this is unexpected, run './firemcp.py status'.")
+        print("[i] Skipping servers.json update.")
         return 0
+    do_update_servers()
     do_start()
     return 0
 
