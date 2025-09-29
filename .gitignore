@@ -1,3 +1,4 @@
 rootfs.ext4
 vmlinux.bin
 mcp.json
+.vscode/
