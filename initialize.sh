@@ -39,9 +39,15 @@ fi
 echo "Scanning Server Configuration"
 mcp-scan /root/servers.json
 
+# Trap Ctrl+C (SIGINT) to reboot
+trap 'echo "Ctrl+C detected, rebooting..."; reboot' SIGINT
+
+
 echo "Starting mcp-proxy..."
-exec mcp-proxy \
+mcp-proxy \
   --host=0.0.0.0 \
   --port=8080 \
   --named-server-config /root/servers.json
+
+
 
