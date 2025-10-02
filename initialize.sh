@@ -20,7 +20,8 @@ if [[ ! -f "$FLAG_FILE" ]]; then
     nodejs \
     npm \
     ca-certificates \
-    curl
+    curl \
+    haveged
 
   echo "Installing uv..."
   curl -LsSf https://astral.sh/uv/install.sh | sh
