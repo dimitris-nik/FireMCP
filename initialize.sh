@@ -31,7 +31,7 @@ if [[ ! -f "$FLAG_FILE" ]]; then
   uv tool install mcp-proxy
   echo "Installing mcp-scan..."
   uv tool install mcp-scan
-
+  mkdir -p /root/.npm
   mkdir -p "$(dirname "$FLAG_FILE")"
   touch "$FLAG_FILE"
 fi

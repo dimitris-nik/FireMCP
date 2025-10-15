@@ -31,7 +31,6 @@ sudo cp -a squashfs-root/* $MOUNT_DIR
 
 echo "[] Copying initialize.sh"
 echo "bash /root/initialize.sh" | sudo tee -a $MOUNT_DIR/root/.bashrc
-mkdir -p $MOUNT_DIR/root/.npm
 touch "$MOUNT_DIR/root/.hushlogin"
 
 echo "[] Fetching kernel from aws CI"
