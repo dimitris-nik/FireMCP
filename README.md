@@ -21,7 +21,7 @@ Minimal harness to build a Firecracker image and run MCP servers inside the VM.
 - `./firemcp.py` or `./firemcp.py auto` — Build on first run, else start the VM.
 - `./firemcp.py start` — Start the VM now.
 - `./firemcp.py images` — Build/rebuild kernel and rootfs (also starts the VM).
-- `./firemcp.py update` — Sync `servers.json` into the rootfs.
+- `./firemcp.py update` — Sync essential files into the rootfs.
 - `./firemcp.py gen-config [servers.json] [mcp.json] [-b BASE] [-p PATH] [-s SUFFIX]` — Generate `mcp.json` from `servers.json`.
 - `./firemcp.py purge` — Delete kernel/rootfs images only (no network changes).
 

@@ -156,7 +156,7 @@ def build_parser():
     for name in ("start", "up"):
         sub.add_parser(name, help="Start the VM (start.sh)")
     sub.add_parser("images", help="Build images (get-imgs.sh) — note: it also starts the VM")
-    sub.add_parser("update", help="Sync essential files and update servers.json")
+    sub.add_parser("update", help="Sync essential.")
 
     p_purge = sub.add_parser("purge", help="Delete kernel/rootfs images only (no network changes)")
     p_purge.add_argument("--force", action="store_true", help="Force purge even if VM looks running or rootfs is mounted")

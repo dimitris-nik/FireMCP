@@ -9,7 +9,6 @@ KERNEL_IMG="vmlinux.bin"
 KERNEL_URL="https://s3.amazonaws.com/spec.ccfc.min/img/hello/kernel/hello-vmlinux.bin"
 ROOTFS_URL="https://s3.amazonaws.com/spec.ccfc.min/firecracker-ci/v1.12/x86_64/ubuntu-24.04.squashfs"
 INIT_SCRIPT="initialize.sh"
-SERVER_CONFIG="servers.json"
 
 echo "[] Getting RootFS image"
 wget -O ubuntu.squashfs $ROOTFS_URL
@@ -32,6 +31,7 @@ sudo cp -a squashfs-root/* $MOUNT_DIR
 
 echo "[] Copying initialize.sh"
 echo "bash /root/initialize.sh" | sudo tee -a $MOUNT_DIR/root/.bashrc
+mkdir -p $MOUNT_DIR/root/.npm
 touch "$MOUNT_DIR/root/.hushlogin"
 
 echo "[] Fetching kernel from aws CI"
