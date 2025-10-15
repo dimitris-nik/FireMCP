@@ -95,6 +95,9 @@ def do_purge_images(force=False):
         raise RuntimeError("rootfs.ext4 appears to be mounted; refuse to purge. Unmount or use --force.")
     remove_file(ROOTFS_IMG)
     remove_file(KERNEL_IMG)
+    remove_file(REPO_ROOT / "mcp.json")
+    remove_file(REPO_ROOT / "servers.firejail.json")
+    print("[+] Purge complete.")
 
 # High level commands
 
@@ -113,7 +116,7 @@ def do_start():
 
 
 def do_update_servers():
-    script = REPO_ROOT / "update-server-list.sh"
+    script = REPO_ROOT / "sync-files.sh"
     if not script.exists():
         raise FileNotFoundError(f"Missing script: {script}")
     run([str(script)], verbose=True)
@@ -136,6 +139,12 @@ def do_generate_config(base, path, suffix, input_json, output_json):
         cmd.extend(["--suffix", suffix])
     run(cmd, verbose=True)
 
+def do_generate_firejail_config():
+    script = REPO_ROOT / "generate-firejail-servers.py"
+    if not script.exists():
+        raise FileNotFoundError(f"Missing script: {script}")
+    cmd = [sys.executable, str(script)]
+    run(cmd, verbose=True)
 
 # CLI
 
@@ -147,7 +156,7 @@ def build_parser():
     for name in ("start", "up"):
         sub.add_parser(name, help="Start the VM (start.sh)")
     sub.add_parser("images", help="Build images (get-imgs.sh) — note: it also starts the VM")
-    sub.add_parser("update", help="Sync servers.json into rootfs (update-server-list.sh)")
+    sub.add_parser("update", help="Sync essential files and update servers.json")
 
     p_purge = sub.add_parser("purge", help="Delete kernel/rootfs images only (no network changes)")
     p_purge.add_argument("--force", action="store_true", help="Force purge even if VM looks running or rootfs is mounted")
@@ -166,17 +175,13 @@ def build_parser():
 
 def cmd_auto():
     if not images_present():
-        print("[+] Images missing — running get-imgs.sh (this will also start the VM)...")
+        print("[+] Images missing — running get-imgs.sh")
         do_get_images()
-        # In case get-imgs.sh didn't start the VM for any reason, ensure we do
-        if not vm_running():
-            print("[+] Starting VM after image setup...")
-            do_start()
-        return 0
     if vm_running():
         print("[+] VM appears to be running already (firectl/firecracker detected). Nothing to do.")
         return 0
     print("[+] Images present — starting VM...")
+    do_generate_firejail_config()
     do_update_servers()
     do_start()
     return 0
@@ -187,6 +192,7 @@ def cmd_start():
         print("[!] VM appears to be running already. If this is unexpected, run './firemcp.py status'.")
         print("[i] Skipping servers.json update.")
         return 0
+    do_generate_firejail_config()
     do_update_servers()
     do_start()
     return 0

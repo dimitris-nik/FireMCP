@@ -31,10 +31,6 @@ echo "[] Copying"
 sudo cp -a squashfs-root/* $MOUNT_DIR
 
 echo "[] Copying initialize.sh"
-sudo cp "$INIT_SCRIPT" "$MOUNT_DIR/root/"
-sudo chmod +x "$MOUNT_DIR/root/$INIT_SCRIPT"
-echo "[] Copying servers.json"
-sudo cp "$SERVER_CONFIG" "$MOUNT_DIR/root/"
 echo "bash /root/initialize.sh" | sudo tee -a $MOUNT_DIR/root/.bashrc
 touch "$MOUNT_DIR/root/.hushlogin"
 

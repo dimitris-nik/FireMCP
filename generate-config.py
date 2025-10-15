@@ -55,7 +55,7 @@ def main() -> int:
 
     out_servers = {}
     for name, cfg in servers.items():
-        if isinstance(cfg, dict) and cfg.get("enabled") is True:
+        if isinstance(cfg, dict):
             out_servers[name] = {"url": build_url(base_url, proto_path, name, suffix)}
 
     out_obj = {"mcpServers": out_servers}

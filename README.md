@@ -36,10 +36,13 @@ Minimal harness to build a Firecracker image and run MCP servers inside the VM.
 	- Or specify details explicitly:
 		- `./firemcp.py gen-config servers.json mcp.json -b http://172.20.0.2:8080 -p /servers -s /sse`
 
+## Firejail profiles
+FireMCP selects the best Firejail profile to use based on the MCP server command. To override, add `profiles/<server>.profile`. Profiles are synced to `/root/profiles` in the VM. To create profiles manually, check [Firejail Documentation](https://man7.org/linux/man-pages/man1/firejail.1.html).
+
 Notes
 - Privileged steps are handled inside the shell scripts (may prompt for sudo).
 - Manual scripts are available if you prefer:
 	- `get-imgs.sh` — build images
 	- `start.sh` — start the VM
-	- `update-server-list.sh` — copy `servers.json` into the rootfs
+	- `sync-files.sh` — copy the firejail-wrapped `servers.firejail.json`, `initialize.sh`, and the `profiles/` directory into the rootfs
 

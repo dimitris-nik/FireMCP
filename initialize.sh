@@ -47,7 +47,7 @@ echo "Starting mcp-proxy..."
 mcp-proxy \
   --host=0.0.0.0 \
   --port=8080 \
-  --named-server-config /root/servers.json
+  --named-server-config /root/servers.firejail.json
 
 
 

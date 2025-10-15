@@ -2,27 +2,19 @@
   "mcpServers": {
     "weather": {
       "command": "npx",
-      "args": ["@h1deya/mcp-server-weather"],
-      "transportType": "stdio",
-      "enabled": true
+      "args": ["@h1deya/mcp-server-weather"]
     },
     "fetch1": {
       "command": "uvx",
-      "args": ["mcp-server-fetch"],
-      "transportType": "stdio",
-      "enabled": true
+      "args": ["mcp-server-fetch"]
     },
     "fetch": {
       "command": "uvx",
-      "args": ["mcp-server-fetch"],
-      "transportType": "stdio",
-      "enabled": true
+      "args": ["mcp-server-fetch"]
     },
     "local-time": {
       "command": "uvx",
-      "args": ["mcp-server-time"],
-      "transportType": "stdio",
-      "enabled": true
+      "args": ["mcp-server-time"]
     }
   }
 }

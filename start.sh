@@ -83,9 +83,6 @@ run_vm() {
         --tap-device="${TAP_NAME}/${mac}"
 }
 
-update_server_list() {
-    run ./update-server-list.sh
-}
 
 main() {
     local device_name
@@ -95,7 +92,6 @@ main() {
     ensure_tap
     enable_ip_forward
     ensure_iptables "$device_name"
-    update_server_list
     run_vm
 }
 
