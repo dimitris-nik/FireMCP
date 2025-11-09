@@ -4,3 +4,5 @@ mcp.json
 .vscode/
 mcp.json
 servers.firejail.json
+mnt
+squashfs-root

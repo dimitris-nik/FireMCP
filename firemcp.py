@@ -9,6 +9,7 @@ REPO_ROOT = Path(__file__).resolve().parent
 ROOTFS_IMG = REPO_ROOT / "rootfs.ext4"
 KERNEL_IMG = REPO_ROOT / "vmlinux.bin"
 TAP_NAME_DEFAULT = "tap0"
+SUBCOMMANDS = ("auto", "start", "up", "images", "update", "purge", "gen-config", "status")
 
 
 class CmdResult:
@@ -108,18 +109,29 @@ def do_get_images():
     run([str(script)], verbose=True)  # This script will start the VM at the end
 
 
-def do_start():
+def do_start(workspace=None):
     script = REPO_ROOT / "start.sh"
     if not script.exists():
         raise FileNotFoundError(f"Missing script: {script}")
     run([str(script)], verbose=True)
+    # After VM process exits
+    if workspace:
+        mth = REPO_ROOT / "move-to-host.sh"
+        if not mth.exists():
+            print(f"[!] move-to-host script not found: {mth}; skipping move-to-host step")
+        else:
+            print(f"[+] VM exited — running move-to-host for workspace: {workspace}")
+            # Run interactively so the script can prompt and use sudo when needed.
+            run([str(mth), workspace], verbose=True)
 
-
-def do_update_servers():
+def do_update_servers(workspace=None):
     script = REPO_ROOT / "sync-files.sh"
     if not script.exists():
         raise FileNotFoundError(f"Missing script: {script}")
-    run([str(script)], verbose=True)
+    cmd = [str(script)]
+    if workspace:
+        cmd.append(workspace)
+    run(cmd, verbose=True)
 
 
 def do_generate_config(base, path, suffix, input_json, output_json):
@@ -173,7 +185,7 @@ def build_parser():
     return p
 
 
-def cmd_auto():
+def cmd_auto(workspace=None):
     if not images_present():
         print("[+] Images missing — running get-imgs.sh")
         do_get_images()
@@ -182,19 +194,19 @@ def cmd_auto():
         return 0
     print("[+] Images present — starting VM...")
     do_generate_firejail_config()
-    do_update_servers()
-    do_start()
+    do_update_servers(workspace)
+    do_start(workspace)
     return 0
 
 
-def cmd_start():
+def cmd_start(workspace=None):
     if vm_running():
         print("[!] VM appears to be running already. If this is unexpected, run './firemcp.py status'.")
         print("[i] Skipping servers.json update.")
         return 0
     do_generate_firejail_config()
-    do_update_servers()
-    do_start()
+    do_update_servers(workspace)
+    do_start(workspace)
     return 0
 
 
@@ -203,8 +215,8 @@ def cmd_images():
     return 0
 
 
-def cmd_update():
-    do_update_servers()
+def cmd_update(workspace=None):
+    do_update_servers(workspace)
     return 0
 
 
@@ -240,19 +252,25 @@ def cmd_status():
 def main(argv=None):
     if argv is None:
         argv = sys.argv[1:]
+    # If the first argument is not a subcommand, treat it as workspace argument
+    workspace = None
+    if len(argv) >= 1 and argv[0] not in SUBCOMMANDS:
+        workspace = argv[0]
+        argv = argv[1:]
+
     parser = build_parser()
     ns = parser.parse_args(argv)
 
     cmd = ns.cmd or "auto"
     try:
         if cmd == "auto":
-            return cmd_auto()
+            return cmd_auto(workspace)
         elif cmd in ("start", "up"):
-            return cmd_start()
+            return cmd_start(workspace)
         elif cmd == "images":
             return cmd_images()
         elif cmd == "update":
-            return cmd_update()
+            return cmd_update(workspace)
         elif cmd == "gen-config":
             return cmd_gen_config(ns)
         elif cmd == "purge":

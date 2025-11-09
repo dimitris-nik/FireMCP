@@ -2,6 +2,11 @@
 set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
 
+# Resize root filesystem to fill the disk
+echo "Resizing root filesystem..."
+resize2fs /dev/vda
+
+
 echo "Configuring network..."
 ip addr replace 172.20.0.2/24 dev eth0
 ip link set eth0 up
