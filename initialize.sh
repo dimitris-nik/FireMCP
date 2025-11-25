@@ -32,6 +32,8 @@ if [[ ! -f "$FLAG_FILE" ]]; then
   curl -LsSf https://astral.sh/uv/install.sh | sh
   export PATH="$HOME/.local/bin:$PATH"
 
+  npm install -g @anthropic-ai/claude-code
+  mkdir -p /mcp-workspace
   echo "Installing mcp-proxy..."
   uv tool install mcp-proxy
   echo "Installing mcp-scan..."
@@ -48,11 +50,15 @@ mcp-scan /root/servers.json
 trap 'echo "Ctrl+C detected, rebooting..."; reboot' SIGINT
 
 
+# Start mcp-proxy in the background
 echo "Starting mcp-proxy..."
 mcp-proxy \
   --host=0.0.0.0 \
   --port=8080 \
-  --named-server-config /root/servers.firejail.json
+  --named-server-config /root/servers.firejail.json &
+
+claude
+
 
 
 

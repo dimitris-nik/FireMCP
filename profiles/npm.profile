@@ -32,6 +32,7 @@ whitelist /root/.local/bin/uv
 whitelist /root/.local/bin/uvx
 whitelist /root/.cache/uv
 whitelist /root/.npm
+noblacklist /mcp-workspace
 
 # =======================
 # Read-only system dirs

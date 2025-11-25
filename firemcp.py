@@ -194,6 +194,12 @@ def cmd_auto(workspace=None):
         return 0
     print("[+] Images present — starting VM...")
     do_generate_firejail_config()
+    # Generate mcp.json pointing at the host binding that code-server/claude inside the VM
+    # will use to reach the proxy. Use 0.0.0.0:8080 so services inside the VM can bind to that.
+    try:
+        do_generate_config("http://0.0.0.0:8080", None, None, "servers.json", "mcp.json")
+    except Exception as e:
+        print(f"[!] Warning: failed to generate mcp.json: {e}")
     do_update_servers(workspace)
     do_start(workspace)
     return 0
@@ -205,6 +211,11 @@ def cmd_start(workspace=None):
         print("[i] Skipping servers.json update.")
         return 0
     do_generate_firejail_config()
+    # Generate mcp.json so it will be synced into the VM image and available to in-VM services.
+    try:
+        do_generate_config("http://0.0.0.0:8080", None, None, "servers.json", "mcp.json")
+    except Exception as e:
+        print(f"[!] Warning: failed to generate mcp.json: {e}")
     do_update_servers(workspace)
     do_start(workspace)
     return 0

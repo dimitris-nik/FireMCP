@@ -77,6 +77,19 @@ if [[ -d "$PROFILES_DIR" ]]; then
   sudo cp -a "$PROFILES_DIR/." "$MOUNT_DIR/root/$PROFILES_DIR/"
 fi
 
+# Ensure mcp-workspace exists inside image even if no external workspace supplied
+echo "[] Ensuring /mcp-workspace exists inside image..."
+sudo mkdir -p "$MOUNT_DIR/mcp-workspace"
+
+# Sync mcp.json into claude config if it exists
+if [[ -f "mcp.json" ]]; then
+  echo "[] Syncing mcp.json to claude config and /root..."
+  sudo mkdir -p "$MOUNT_DIR/root/.claude/"
+  sudo cp -a "mcp.json" "$MOUNT_DIR/root/.claude/config.json"
+else
+  echo "[!] Notice: mcp.json not found in host dir; skipping mcp.json sync"
+fi
+
 # Sync external workspace directory if provided as first argument
 if [[ -n "$WORKSPACE_DIR" ]]; then
   if [[ ! -d "$WORKSPACE_DIR" ]]; then
