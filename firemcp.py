@@ -97,7 +97,11 @@ def do_purge_images(force=False):
     remove_file(ROOTFS_IMG)
     remove_file(KERNEL_IMG)
     remove_file(REPO_ROOT / "mcp.json")
+    remove_file(REPO_ROOT / "mcp_vm.json")
     remove_file(REPO_ROOT / "servers.firejail.json")
+    remove_file(REPO_ROOT / "id_rsa.pub")
+    remove_file(REPO_ROOT / "ubuntu.squashfs")
+    
     print("[+] Purge complete.")
 
 # High level commands
@@ -131,6 +135,25 @@ def do_update_servers(workspace=None):
     cmd = [str(script)]
     if workspace:
         cmd.append(workspace)
+    # Always look for ssh public key in current directory and pass to sync-files.sh
+    pubkey = REPO_ROOT / "id_rsa.pub"
+    if not pubkey.exists():
+        # Try to find a public key in ~/.ssh
+        ssh_dir = Path.home() / ".ssh"
+        found = False
+        for keytype in ["id_ed25519.pub", "id_rsa.pub", "id_ecdsa.pub"]:
+            candidate = ssh_dir / keytype
+            if candidate.exists():
+                print(f"[+] Copying {candidate} to {pubkey}")
+                pubkey.write_text(candidate.read_text())
+                found = True
+                break
+        if not found:
+            # Generate a new key
+            print("[+] No SSH public key found, generating new key pair...")
+            run(["ssh-keygen", "-t", "rsa", "-b", "4096", "-N", "", "-f", str(REPO_ROOT / "id_rsa.pub")], verbose=True)
+            pubkey = REPO_ROOT / "id_rsa.pub"
+    # Now run sync-files.sh, which will copy id_rsa.pub into the VM
     run(cmd, verbose=True)
 
 
@@ -197,9 +220,9 @@ def cmd_auto(workspace=None):
     # Generate mcp.json pointing at the host binding that code-server/claude inside the VM
     # will use to reach the proxy. Use 0.0.0.0:8080 so services inside the VM can bind to that.
     try:
-        do_generate_config("http://0.0.0.0:8080", None, None, "servers.json", "mcp.json")
+        do_generate_config("http://0.0.0.0:8080", None, None, "servers.json", "mcp_vm.json")
     except Exception as e:
-        print(f"[!] Warning: failed to generate mcp.json: {e}")
+        print(f"[!] Warning: failed to generate mcp_vm.json: {e}")
     do_update_servers(workspace)
     do_start(workspace)
     return 0
@@ -213,9 +236,9 @@ def cmd_start(workspace=None):
     do_generate_firejail_config()
     # Generate mcp.json so it will be synced into the VM image and available to in-VM services.
     try:
-        do_generate_config("http://0.0.0.0:8080", None, None, "servers.json", "mcp.json")
+        do_generate_config("http://0.0.0.0:8080", None, None, "servers.json", "mcp_vm.json")
     except Exception as e:
-        print(f"[!] Warning: failed to generate mcp.json: {e}")
+        print(f"[!] Warning: failed to generate mcp_vm.json: {e}")
     do_update_servers(workspace)
     do_start(workspace)
     return 0

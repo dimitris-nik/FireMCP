@@ -77,17 +77,33 @@ if [[ -d "$PROFILES_DIR" ]]; then
   sudo cp -a "$PROFILES_DIR/." "$MOUNT_DIR/root/$PROFILES_DIR/"
 fi
 
+
 # Ensure mcp-workspace exists inside image even if no external workspace supplied
 echo "[] Ensuring /mcp-workspace exists inside image..."
 sudo mkdir -p "$MOUNT_DIR/mcp-workspace"
 
-# Sync mcp.json into claude config if it exists
-if [[ -f "mcp.json" ]]; then
-  echo "[] Syncing mcp.json to claude config and /root..."
+# Sync mcp_vm.json into appropriate config locations for agents
+if [[ -f "mcp_vm.json" ]]; then
+  echo "[] Syncing mcp_vm.json to claude config and /root..."
   sudo mkdir -p "$MOUNT_DIR/root/.claude/"
-  sudo cp -a "mcp.json" "$MOUNT_DIR/root/.claude/config.json"
+  sudo cp -a "mcp_vm.json" "$MOUNT_DIR/root/.claude/config.json"
+  # Also copy to cursor config path for cursor/agent compatibility
+  sudo mkdir -p "$MOUNT_DIR/root/.cursor/"
+  sudo cp -a "mcp_vm.json" "$MOUNT_DIR/root/.cursor/mcp.json"
+  # Also copy for vscode code compatibility 
+  sudo mkdir -p "$MOUNT_DIR/root/.config/code-server/"
+  sudo cp -a "mcp_vm.json" "$MOUNT_DIR/root/.config/code-server/mcp.json"
+
 else
-  echo "[!] Notice: mcp.json not found in host dir; skipping mcp.json sync"
+  echo "[!] Notice: mcp_vm.json not found in host dir; skipping mcp_vm.json sync"
+fi
+
+# Sync SSH public key if present
+if [[ -f "id_rsa.pub" ]]; then
+  echo "[] Syncing id_rsa.pub to rootfs..."
+  sudo mkdir -p "$MOUNT_DIR/root/.ssh"
+  sudo cp "id_rsa.pub" "$MOUNT_DIR/root/.ssh/authorized_keys"
+  sudo chmod 600 "$MOUNT_DIR/root/.ssh/authorized_keys"
 fi
 
 # Sync external workspace directory if provided as first argument

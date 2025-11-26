@@ -2,6 +2,12 @@
 set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
 
+# If this script is being executed from an SSH session skip initialization.
+if [ -n "${SSH_CONNECTION:-}" ] || [ -n "${SSH_TTY:-}" ]; then
+  echo "Detected SSH session; skipping initialization to avoid interactive installs/startup."
+  exit 0
+fi
+
 # Resize root filesystem to fill the disk
 echo "Resizing root filesystem..."
 resize2fs /dev/vda
@@ -13,10 +19,11 @@ ip link set eth0 up
 ip route replace default via 172.20.0.1
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
 
+
 FLAG_FILE="/var/lib/first_boot_flag"
 
 if [[ ! -f "$FLAG_FILE" ]]; then
-  echo "Installing dependencies (firejail, nodejs, npm, ca-certificates)..."
+  echo "Installing dependencies (firejail, nodejs, npm, ca-certificates, openssh-server)..."
   export DEBIAN_FRONTEND=noninteractive
   export DEBIAN_PRIORITY=critical
   apt-get update -yq
@@ -26,7 +33,8 @@ if [[ ! -f "$FLAG_FILE" ]]; then
     npm \
     ca-certificates \
     curl \
-    haveged
+    haveged \
+    openssh-server
 
   echo "Installing uv..."
   curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -42,6 +50,11 @@ if [[ ! -f "$FLAG_FILE" ]]; then
   mkdir -p "$(dirname "$FLAG_FILE")"
   touch "$FLAG_FILE"
 fi
+
+# Enable and start SSH service
+echo "Enabling and starting SSH service..."
+systemctl enable ssh || true
+systemctl restart ssh || service ssh restart || /etc/init.d/ssh restart || true
 
 echo "Scanning Server Configuration"
 mcp-scan /root/servers.json

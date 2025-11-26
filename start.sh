@@ -81,7 +81,7 @@ run_vm() {
         --root-drive="${ROOT_FS}" \
         --kernel-opts="console=ttyS0 noapic reboot=k panic=1 pci=off nomodules rw" \
         --tap-device="${TAP_NAME}/${mac}" \
-        --memory 4096
+        --memory 4096 
 }
 
 

@@ -2,7 +2,7 @@ rootfs.ext4
 vmlinux.bin
 mcp.json
 .vscode/
-mcp.json
+mcp_vm.json
 servers.firejail.json
 mnt
 squashfs-root
